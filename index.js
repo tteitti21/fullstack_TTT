@@ -1,6 +1,9 @@
 const express = require('express')
 const phonebookApp = express()
 
+phonebookApp.use(express.json())
+phonebookApp.use(express.urlencoded({ extended: true }))
+
 let persons = [
     { 
       "id": 1,
@@ -24,10 +27,12 @@ let persons = [
     }
 ]
 
+// GET mainpage
 phonebookApp.get('/', (request, response) => {
     response.send('<h1>Main page</h1>')
 })
 
+// GET info
 phonebookApp.get('/info', (request, response) => {
     const infoPage = 
         `<div>Phonebook has info for ${persons.length} people.
@@ -35,10 +40,12 @@ phonebookApp.get('/info', (request, response) => {
     response.send(infoPage)
 })
 
+// GET all
 phonebookApp.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+// GET by ID
 phonebookApp.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
@@ -48,6 +55,53 @@ phonebookApp.get('/api/persons/:id', (request, response) => {
         })
     }
     response.json(person)
+})
+
+/** Creates random ID for person that cannot match with any existing
+ * id, otherwise it recalls itself until unique one is found.
+ */
+const IdGenerator = () => {
+    let id = Math.floor(Math.random() * 1000)
+    if (persons.find(person => person.id === id) === undefined) {
+        return (id)
+    } else {
+        return IdGenerator()
+    }}
+
+/** creates a phonebook entry that is created during POST request */
+const createPerson = (body) => {
+    const person = {
+        "name": body.name,
+        "number": body.number,
+        "id": IdGenerator()
+    }
+    persons = persons.concat(person)
+    return ( person )
+}
+
+// POST
+phonebookApp.post('/api/persons', (request, response) => {
+    const body = request.body
+
+        return body.name === undefined ? response.status(418).json({
+                    error: 'Name is not defined'
+                })
+        : body.number === undefined ? response.status(406).json({
+                    error: 'Number is not defined'
+                })
+        : persons.find(p => p.name === body.name) !== undefined ?
+                    response.status(406).json({
+                        error: 'Name already exists'
+                    })
+        : response.json(createPerson(body))
+})
+
+// DELETE
+phonebookApp.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    persons = persons.filter(person => person.id !== id)
+
+    response.status(204).end()
 })
 
 const PORT = 3001
