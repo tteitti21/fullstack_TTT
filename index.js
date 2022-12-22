@@ -1,9 +1,27 @@
 const express = require('express')
+const morgan = require('morgan')
 const phonebookApp = express()
 
 phonebookApp.use(express.json())
 phonebookApp.use(express.urlencoded({ extended: true }))
+//phonebookApp.use(morgan('tiny'))
 
+// If method is POST, logs the send data of the person
+morgan.token('send-data', function(req, res) {
+    return req.method === 'POST' ? JSON.stringify(req.body)
+    : undefined
+})
+
+phonebookApp.use(morgan((tokens, req, res) => {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        tokens['send-data'](req, res)
+    ].join(' ')
+}))
 let persons = [
     { 
       "id": 1,
