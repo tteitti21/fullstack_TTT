@@ -1,12 +1,15 @@
 const express = require('express')
-const morgan = require('morgan')
+//const morgan = require('morgan')
 const phonebookApp = express()
+const cors = require('cors')
 
+phonebookApp.use(cors())
 phonebookApp.use(express.json())
 phonebookApp.use(express.urlencoded({ extended: true }))
 //phonebookApp.use(morgan('tiny'))
 
 // If method is POST, logs the send data of the person
+/** 
 morgan.token('send-data', function(req, res) {
     return req.method === 'POST' ? JSON.stringify(req.body)
     : undefined
@@ -21,7 +24,8 @@ phonebookApp.use(morgan((tokens, req, res) => {
         tokens['response-time'](req, res), 'ms',
         tokens['send-data'](req, res)
     ].join(' ')
-}))
+}))  */
+
 let persons = [
     { 
       "id": 1,
@@ -30,7 +34,7 @@ let persons = [
     },
     { 
       "id": 2,
-      "name": "Ada Lovelace", 
+      "name": "Eva Lovelace", 
       "number": "39-44-5323523"
     },
     { 
@@ -122,7 +126,7 @@ phonebookApp.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 phonebookApp.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
