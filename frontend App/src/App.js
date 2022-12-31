@@ -92,12 +92,12 @@ const App = () => {
     setSearchField(event.target.value)
   }
   const handleDeletion = (event) => {
-    let person = persons.find(person => person.id === parseInt(event.target.id))
+    let person = persons.find(person => person.id === event.target.id)
     if (window.confirm(`Delete ${person.name} ?`)){
     AxiosCalls
     .deletePerson(event.target.id)
     .then(setPersons(
-      persons.filter(person => person.id !== parseInt(event.target.id))))
+      persons.filter(person => person.id !== event.target.id)))
     }
   }
   
