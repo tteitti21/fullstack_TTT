@@ -47,6 +47,15 @@ const App = () => {
           setMessageType(null)
         }, 3000) 
       })
+      .catch(error => {
+        setMessageType(false)
+        setNotificationMessage(error.response.data.errorMessage)
+        console.log(error.response.data.errorMessage)
+        setTimeout(() => {
+          setNotificationMessage(null)
+          setMessageType(null)
+        }, 3000)
+      })
     }
     else {
       if (window.confirm(`${newName} is already added to phonebook,

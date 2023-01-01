@@ -37,19 +37,23 @@ phonebookApp.get('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-/** creates a phonebook entry that is created during POST request */
-const createPerson = (body) => {
+/** creates a phonebook entry that is created during POST request 
+ * saves it to DB and returns response. If validation fails, 
+ * returns reponse according to errorhandler.
+*/
+const createPerson = (body, next, response) => {
     const person = new Person({
         "name": body.name,
         "number": body.number,
     })
     person.save().then(savedPerson => {
-        return savedPerson
-    })   
+        return response.json(savedPerson)
+    })
+    .catch(error => next(error))  
 }
 
 // POST
-phonebookApp.post('/api/persons', (request, response) => {
+phonebookApp.post('/api/persons', (request, response, next) => {
     const body = request.body
 
         return body.name === undefined ? response.status(418).json({
@@ -58,7 +62,7 @@ phonebookApp.post('/api/persons', (request, response) => {
         : body.number === undefined ? response.status(406).json({
                     error: 'Number is not defined'
                 })
-        : response.json(createPerson(body))
+        : createPerson(body, next, response)
 })
 
 // DELETE
@@ -96,8 +100,10 @@ phonebookApp.use(unknownURL)
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     if (error.name === 'CastError') {
-      return response.status(400).send({ error: 'malformatted id' })
-    } 
+      return response.status(400).send({ errorMessage: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ errorMessage: 'Validation failed. Min 3 chars'})
+    }
     next(error)
 }
   
