@@ -4,6 +4,7 @@ const phonebookApp = express()
 const cors = require('cors')
 const Person = require('./models/person')
 
+phonebookApp.use(express.static('build'))
 phonebookApp.use(cors())
 phonebookApp.use(express.json())
 phonebookApp.use(express.urlencoded({ extended: true }))
