@@ -8,6 +8,15 @@ phonebookApp.use(cors())
 phonebookApp.use(express.json())
 phonebookApp.use(express.urlencoded({ extended: true }))
 
+// GET info page
+phonebookApp.get('/info', async function(request, response) {
+    const persons = await Person.find().exec()
+    const infoPage = 
+        `<div>Phonebook has info for ${persons.length} people.
+        </div> <div>${new Date()}</div>`
+    response.send(infoPage)
+})
+
 // GET all
 phonebookApp.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
