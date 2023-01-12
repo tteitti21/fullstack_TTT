@@ -110,7 +110,7 @@ const errorHandler = (error, request, response, next) => {
 
 phonebookApp.use(errorHandler)
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3001
 phonebookApp.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
